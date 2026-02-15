@@ -1,0 +1,52 @@
+System Analysis WorkFlow
+
+1. Study Existing IVR System
+        ↓
+2. Review Architecture & Capabilities
+        ↓
+3. Analyze Current Integration Mechanisms
+        ↓
+4. Identify Technical Challenges & Constraints
+        ↓
+5. Detect Compatibility Gaps (ACS & BAP)
+        ↓
+6. Define Integration Requirements
+        ↓
+7. Propose Integration Strategy
+        ↓
+8. Prepare Documentation
+
+
+🧾 Explanation (Simple for PPT)
+
+1️⃣ Study Existing IVR
+
+Understand how the hospital IVR works.
+
+2️⃣ Review Architecture
+
+Check system structure (VXML server, telephony, database).
+
+3️⃣ Analyze Integration
+
+See how it connects to backend systems.
+
+4️⃣ Identify Challenges
+
+Find performance, scalability, and security issues.
+
+5️⃣ Identify Gaps
+
+Check compatibility problems with ACS & BAP.
+
+6️⃣ Define Requirements
+
+Write what is needed for modernization.
+
+7️⃣ Propose Strategy
+
+Suggest API-based middleware integration.
+
+8️⃣ Documentation
+
+Prepare formal report (Milestone 1 submission).
