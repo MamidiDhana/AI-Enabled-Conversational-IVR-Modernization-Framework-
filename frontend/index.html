@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Web IVR Simulator</title>
+</head>
+<body>
+
+<h2>Web IVR Simulator</h2>
+
+<button onclick="startCall()">Start Call</button>
+<br><br>
+
+<button onclick="sendInput('1')">1</button>
+<button onclick="sendInput('2')">2</button>
+
+<p id="output"></p>
+
+<script>
+let sessionId = "";
+
+function startCall() {
+    fetch("http://127.0.0.1:8000/ivr/start", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({})
+    })
+    .then(res => res.json())
+    .then(data => {
+        sessionId = data.session_id;
+        document.getElementById("output").innerText = data.message;
+    });
+}
+
+function sendInput(digit) {
+    fetch("http://127.0.0.1:8000/ivr/input", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({
+            session_id: sessionId,
+            digit: digit
+        })
+    })
+    .then(res => res.json())
+    .then(data => {
+        document.getElementById("output").innerText = data.message;
+    });
+}
+</script>
+
+</body>
+</html>
