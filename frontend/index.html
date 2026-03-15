@@ -1,50 +1,987 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Web IVR Simulator</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>City Hospital IVR System</title>
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+}
+
+body{
+font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;
+background:linear-gradient(135deg,#0f0c29,#302b63,#24243e);
+min-height:100vh;
+display:flex;
+justify-content:center;
+align-items:center;
+color:#fff;
+}
+
+.container{
+background:rgba(255,255,255,0.06);
+backdrop-filter:blur(12px);
+border:1px solid rgba(255,255,255,0.12);
+border-radius:24px;
+padding:40px 36px;
+width:400px;
+box-shadow:0 8px 32px rgba(0,0,0,0.4);
+text-align:center;
+}
+
+h2{
+font-size:1.6rem;
+margin-bottom:6px;
+}
+
+.subtitle{
+font-size:0.85rem;
+color:rgba(255,255,255,0.6);
+margin-bottom:20px;
+}
+
+.start-btn{
+width:100%;
+padding:14px;
+border:none;
+border-radius:12px;
+cursor:pointer;
+font-weight:600;
+background:linear-gradient(135deg,#667eea,#764ba2);
+color:white;
+margin-bottom:20px;
+}
+
+.keypad{
+display:grid;
+grid-template-columns:repeat(3,1fr);
+gap:12px;
+margin-bottom:20px;
+}
+
+.key-btn{
+padding:16px;
+font-size:1.2rem;
+border-radius:12px;
+border:1px solid rgba(255,255,255,0.15);
+background:rgba(255,255,255,0.08);
+color:white;
+cursor:pointer;
+}
+
+.output-box{
+background:rgba(0,0,0,0.25);
+border:1px solid rgba(255,255,255,0.1);
+border-radius:12px;
+padding:18px;
+margin-top:15px;
+min-height:60px;
+}
+
+.language-status{
+margin-top:8px;
+font-size:0.78rem;
+color:rgba(255,255,255,0.75);
+text-align:right;
+}
+
+#output{
+font-size:0.95rem;
+}
+
+.ai-box{
+margin-top:20px;
+display:flex;
+gap:10px;
+}
+
+.ai-box input{
+flex:1;
+padding:10px;
+border-radius:8px;
+border:none;
+outline:none;
+}
+
+.ai-box button{
+padding:10px 14px;
+border:none;
+border-radius:8px;
+cursor:pointer;
+background:#667eea;
+color:white;
+}
+
+.control-row{
+display:flex;
+justify-content:center;
+align-items:center;
+flex-wrap:wrap;
+gap:8px;
+margin-bottom:14px;
+}
+
+.toggle-btn{
+padding:8px 12px;
+border:none;
+border-radius:8px;
+cursor:pointer;
+background:rgba(255,255,255,0.15);
+color:#fff;
+font-size:0.85rem;
+}
+
+.language-select{
+padding:8px 10px;
+border:none;
+border-radius:8px;
+outline:none;
+background:rgba(255,255,255,0.15);
+color:#fff;
+font-size:0.85rem;
+}
+
+.language-select option{
+color:#111;
+}
+
+.stop-btn{
+padding:8px 12px;
+border:none;
+border-radius:8px;
+cursor:pointer;
+background:rgba(255,99,71,0.85);
+color:#fff;
+font-size:0.85rem;
+}
+
+.quick-actions{
+display:flex;
+flex-wrap:wrap;
+gap:8px;
+justify-content:center;
+margin-top:14px;
+}
+
+.quick-btn{
+padding:8px 10px;
+font-size:0.8rem;
+border:none;
+border-radius:8px;
+cursor:pointer;
+background:rgba(255,255,255,0.12);
+color:#fff;
+}
+
+.history-box{
+margin-top:14px;
+background:rgba(255,255,255,0.06);
+border:1px solid rgba(255,255,255,0.1);
+border-radius:10px;
+padding:10px;
+max-height:140px;
+overflow-y:auto;
+text-align:left;
+}
+
+.history-box h4{
+font-size:0.82rem;
+margin-bottom:8px;
+color:rgba(255,255,255,0.8);
+}
+
+.history-item{
+font-size:0.78rem;
+margin-bottom:6px;
+color:rgba(255,255,255,0.9);
+}
+
+/* notification style */
+
+.notification{
+position:fixed;
+bottom:20px;
+right:20px;
+background:#667eea;
+padding:10px 16px;
+border-radius:8px;
+color:white;
+font-size:14px;
+box-shadow:0 4px 10px rgba(0,0,0,0.3);
+}
+
+</style>
 </head>
+
 <body>
 
-<h2>Web IVR Simulator</h2>
+<div class="container">
 
-<button onclick="startCall()">Start Call</button>
-<br><br>
+<div style="font-size:40px;margin-bottom:10px;">🏥</div>
 
-<button onclick="sendInput('1')">1</button>
-<button onclick="sendInput('2')">2</button>
+<h2>City Hospital IVR</h2>
+<p id="subtitle" class="subtitle">Hospital Management Conversational IVR</p>
 
-<p id="output"></p>
+<div class="control-row">
+<select id="languageSelect" class="language-select" onchange="setLanguage(this.value)">
+<option value="en-US">English</option>
+<option value="hi-IN">हिन्दी</option>
+<option value="ta-IN">தமிழ்</option>
+<option value="te-IN">తెలుగు</option>
+<option value="kn-IN">ಕನ್ನಡ</option>
+<option value="ml-IN">മലയാളം</option>
+<option value="bn-IN">বাংলা</option>
+</select>
+<button id="speechToggle" class="toggle-btn" onclick="toggleSpeech()">Voice: On</button>
+<button id="stopBtn" class="stop-btn" onclick="stopVoice()">Stop Voice</button>
+</div>
+
+<button id="startBtn" class="start-btn" onclick="startCall()">Start Call</button>
+
+<div class="keypad">
+<button class="key-btn" onclick="sendInput('1')">1</button>
+<button class="key-btn" onclick="sendInput('2')">2</button>
+<button class="key-btn" onclick="sendInput('3')">3</button>
+<button class="key-btn" onclick="sendInput('4')">4</button>
+<button class="key-btn" onclick="sendInput('5')">5</button>
+<button class="key-btn" onclick="sendInput('6')">6</button>
+<button class="key-btn" onclick="sendInput('7')">7</button>
+<button class="key-btn" onclick="sendInput('8')">8</button>
+<button class="key-btn" onclick="sendInput('9')">9</button>
+<button class="key-btn" onclick="sendInput('*')">*</button>
+<button class="key-btn" onclick="sendInput('0')">0</button>
+<button class="key-btn" onclick="sendInput('#')">#</button>
+</div>
+
+<div class="output-box">
+<p id="output">Press Start Call to contact City Hospital. Press 4 for Department Information.</p>
+<p id="languageStatus" class="language-status">Language: English</p>
+</div>
+
+<div class="ai-box">
+<input id="aiInput" placeholder="Type: I want appointment">
+<button id="sendBtn" onclick="sendAI()">Send</button>
+<button id="voiceBtn" onclick="startVoice()">🎤</button>
+</div>
+
+<div class="quick-actions">
+<button id="quickDepartments" class="quick-btn" onclick="quickAsk('what departments are available')">Departments</button>
+<button id="quickTimings" class="quick-btn" onclick="quickAsk('hospital timings')">Timings</button>
+<button id="quickLocation" class="quick-btn" onclick="quickAsk('hospital location')">Location</button>
+<button id="quickInsurance" class="quick-btn" onclick="quickAsk('insurance support')">Insurance</button>
+</div>
+
+<div class="history-box">
+<h4 id="historyTitle">Live Interaction History</h4>
+<div id="history"></div>
+</div>
+
+</div>
 
 <script>
-let sessionId = "";
 
-function startCall() {
-    fetch("http://127.0.0.1:8000/ivr/start", {
-        method: "POST",
-        headers: {"Content-Type": "application/json"},
-        body: JSON.stringify({})
-    })
-    .then(res => res.json())
-    .then(data => {
-        sessionId = data.session_id;
-        document.getElementById("output").innerText = data.message;
-    });
+let sessionId="";
+let speechEnabled=true;
+let selectedLanguage="en-US";
+let speechReady=false;
+let currentAudio=null;
+
+const RECOGNITION_LANGUAGE_MAP={
+"en-US":"en-IN",
+"hi-IN":"hi-IN",
+"ta-IN":"ta-IN",
+"te-IN":"te-IN",
+"kn-IN":"kn-IN",
+"ml-IN":"ml-IN",
+"bn-IN":"bn-IN"
+};
+
+const UNKNOWN_HELP_MAP={
+"en-US":"Try: departments, timings, location, or insurance.",
+"hi-IN":"कृपया विभाग, समय, स्थान या इंश्योरेंस के बारे में पूछें।",
+"ta-IN":"தயவுசெய்து துறைகள், நேரங்கள், இடம் அல்லது காப்பீடு பற்றி கேளுங்கள்.",
+"te-IN":"దయచేసి విభాగాలు, సమయాలు, స్థానం లేదా ఇన్షూరెన్స్ గురించి అడగండి.",
+"kn-IN":"ದಯವಿಟ್ಟು ವಿಭಾಗಗಳು, ಸಮಯ, ಸ್ಥಳ ಅಥವಾ ವಿಮೆ ಬಗ್ಗೆ ಕೇಳಿ.",
+"ml-IN":"ദയവായി വിഭാഗങ്ങൾ, സമയം, സ്ഥലം, അല്ലെങ്കിൽ ഇൻഷുറൻസ് സംബന്ധിച്ച് ചോദിക്കുക.",
+"bn-IN":"অনুগ্রহ করে বিভাগ, সময়, অবস্থান বা বীমা সম্পর্কে জিজ্ঞাসা করুন।"
+};
+
+const UI_LABELS={
+"en-US":{
+subtitle:"Hospital Management Conversational IVR",
+startCall:"Start Call",
+send:"Send",
+voiceOn:"Voice: On",
+voiceOff:"Voice: Off",
+stopVoice:"Stop Voice",
+history:"Live Interaction History",
+aiPlaceholder:"Type: I want appointment",
+languageStatus:"Language: English",
+quickDepartments:"Departments",
+quickTimings:"Timings",
+quickLocation:"Location",
+quickInsurance:"Insurance",
+defaultOutput:"Press Start Call to contact City Hospital. Press 4 for Department Information."
+},
+"hi-IN":{
+subtitle:"अस्पताल प्रबंधन संवादात्मक आईवीआर",
+startCall:"कॉल शुरू करें",
+send:"भेजें",
+voiceOn:"आवाज़: चालू",
+voiceOff:"आवाज़: बंद",
+stopVoice:"आवाज़ रोकें",
+history:"लाइव इंटरैक्शन हिस्ट्री",
+aiPlaceholder:"टाइप करें: मुझे अपॉइंटमेंट चाहिए",
+languageStatus:"भाषा: हिन्दी",
+quickDepartments:"विभाग",
+quickTimings:"समय",
+quickLocation:"स्थान",
+quickInsurance:"बीमा",
+defaultOutput:"सिटी हॉस्पिटल से जुड़ने के लिए कॉल शुरू करें दबाएं। विभाग जानकारी के लिए चार दबाएं।"
+},
+"ta-IN":{
+subtitle:"மருத்துவமனை மேலாண்மை உரையாடல் ஐவிஆர்",
+startCall:"அழைப்பை தொடங்கு",
+send:"அனுப்பு",
+voiceOn:"குரல்: இயக்கு",
+voiceOff:"குரல்: நிறுத்து",
+stopVoice:"குரலை நிறுத்து",
+history:"நேரடி உரையாடல் வரலாறு",
+aiPlaceholder:"தட்டச்சு செய்யவும்: எனக்கு நேரம் வேண்டும்",
+languageStatus:"மொழி: தமிழ்",
+quickDepartments:"துறைகள்",
+quickTimings:"நேரங்கள்",
+quickLocation:"இடம்",
+quickInsurance:"காப்பீடு",
+defaultOutput:"சிட்டி மருத்துவமனைக்கு தொடர்பு கொள்ள அழைப்பை தொடங்கு அழுத்தவும். துறை தகவலுக்கு நான்கு அழுத்தவும்."
+},
+"te-IN":{
+subtitle:"ఆసుపత్రి నిర్వహణ సంభాషణాత్మక ఐవిఆర్",
+startCall:"కాల్ ప్రారంభించండి",
+send:"పంపండి",
+voiceOn:"వాయిస్: ఆన్",
+voiceOff:"వాయిస్: ఆఫ్",
+stopVoice:"వాయిస్ నిలిపివేయండి",
+history:"లైవ్ ఇంటరాక్షన్ చరిత్ర",
+aiPlaceholder:"టైప్ చేయండి: నాకు అపాయింట్మెంట్ కావాలి",
+languageStatus:"భాష: తెలుగు",
+quickDepartments:"విభాగాలు",
+quickTimings:"సమయాలు",
+quickLocation:"స్థానం",
+quickInsurance:"బీమా",
+defaultOutput:"సిటీ హాస్పిటల్‌ను సంప్రదించడానికి కాల్ ప్రారంభించండి నొక్కండి. విభాగ సమాచారం కోసం నాలుగు నొక్కండి."
+},
+"kn-IN":{
+subtitle:"ಆಸ್ಪತ್ರೆ ನಿರ್ವಹಣಾ ಸಂಭಾಷಣಾತ್ಮಕ ಐವಿಆರ್",
+startCall:"ಕಾಲ್ ಪ್ರಾರಂಭಿಸಿ",
+send:"ಕಳುಹಿಸಿ",
+voiceOn:"ಧ್ವನಿ: ಆನ್",
+voiceOff:"ಧ್ವನಿ: ಆಫ್",
+stopVoice:"ಧ್ವನಿ ನಿಲ್ಲಿಸಿ",
+history:"ಲೈವ್ ಸಂವಾದ ಇತಿಹಾಸ",
+aiPlaceholder:"ಟೈಪ್ ಮಾಡಿ: ನನಗೆ ಅಪಾಯಿಂಟ್ಮೆಂಟ್ ಬೇಕು",
+languageStatus:"ಭಾಷೆ: ಕನ್ನಡ",
+quickDepartments:"ವಿಭಾಗಗಳು",
+quickTimings:"ಸಮಯ",
+quickLocation:"ಸ್ಥಳ",
+quickInsurance:"ವಿಮೆ",
+defaultOutput:"ಸಿಟಿ ಆಸ್ಪತ್ರೆಗೆ ಸಂಪರ್ಕಿಸಲು ಕಾಲ್ ಪ್ರಾರಂಭಿಸಿ ಒತ್ತಿರಿ. ವಿಭಾಗ ಮಾಹಿತಿಗಾಗಿ ನಾಲ್ಕು ಒತ್ತಿರಿ."
+},
+"ml-IN":{
+subtitle:"ആശുപത്രി മാനേജ്മെന്റ് സംഭാഷണ ഐവിആർ",
+startCall:"കോൾ ആരംഭിക്കുക",
+send:"അയയ്ക്കുക",
+voiceOn:"ശബ്‌ദം: ഓൺ",
+voiceOff:"ശബ്‌ദം: ഓഫ്",
+stopVoice:"ശബ്‌ദം നിർത്തുക",
+history:"ലൈവ് ഇടപാട് ചരിത്രം",
+aiPlaceholder:"ടൈപ്പ് ചെയ്യുക: എനിക്ക് അപ്പോയിന്റ്മെന്റ് വേണം",
+languageStatus:"ഭാഷ: മലയാളം",
+quickDepartments:"വിഭാഗങ്ങൾ",
+quickTimings:"സമയം",
+quickLocation:"സ്ഥലം",
+quickInsurance:"ഇൻഷുറൻസ്",
+defaultOutput:"സിറ്റി ആശുപത്രിയെ ബന്ധപ്പെടാൻ കോൾ ആരംഭിക്കുക അമർത്തുക. വിഭാഗ വിവരങ്ങൾക്ക് നാല് അമർത്തുക."
+},
+"bn-IN":{
+subtitle:"হাসপাতাল ম্যানেজমেন্ট কথোপকথনভিত্তিক আইভিআর",
+startCall:"কল শুরু করুন",
+send:"পাঠান",
+voiceOn:"ভয়েস: চালু",
+voiceOff:"ভয়েস: বন্ধ",
+stopVoice:"ভয়েস বন্ধ করুন",
+history:"লাইভ ইন্টারঅ্যাকশন ইতিহাস",
+aiPlaceholder:"টাইপ করুন: আমার অ্যাপয়েন্টমেন্ট চাই",
+languageStatus:"ভাষা: বাংলা",
+quickDepartments:"বিভাগ",
+quickTimings:"সময়",
+quickLocation:"অবস্থান",
+quickInsurance:"বীমা",
+defaultOutput:"সিটি হাসপাতালের সাথে যোগাযোগ করতে কল শুরু করুন চাপুন। বিভাগীয় তথ্যের জন্য চার চাপুন।"
+}
+};
+
+const WAIT_MINUTE_WORDS={
+"en-US":{"5":"five","8":"eight","12":"twelve","15":"fifteen","18":"eighteen"},
+"hi-IN":{"5":"पांच","8":"आठ","12":"बारह","15":"पंद्रह","18":"अठारह"},
+"ta-IN":{"5":"ஐந்து","8":"எட்டு","12":"பன்னிரண்டு","15":"பதினைந்து","18":"பதினெட்டு"},
+"te-IN":{"5":"ఐదు","8":"ఎనిమిది","12":"పన్నెండు","15":"పదిహేను","18":"పద్దెనిమిది"},
+"kn-IN":{"5":"ಐದು","8":"ಎಂಟು","12":"ಹನ್ನೆರಡು","15":"ಹದಿನೈದು","18":"ಹದಿನೆಂಟು"},
+"ml-IN":{"5":"അഞ്ച്","8":"എട്ട്","12":"പന്ത്രണ്ട്","15":"പതിനഞ്ച്","18":"പതിനെട്ട്"},
+"bn-IN":{"5":"পাঁচ","8":"আট","12":"বারো","15":"পনেরো","18":"আঠারো"}
+};
+
+const STATIC_TRANSLATIONS={
+"hi-IN":{
+"Welcome to City Hospital IVR. Press 1 for Appointment Booking, Press 2 for Doctor Availability, Press 3 for Emergency Services, Press 4 for Department Information, Press 5 for Hospital Timings, Press 6 for Hospital Location, Press 9 to hear this menu again.":"सिटी हॉस्पिटल आईवीआर में आपका स्वागत है। अपॉइंटमेंट बुकिंग के लिए एक दबाएं, डॉक्टर उपलब्धता के लिए दो, आपातकालीन सेवाओं के लिए तीन, विभाग जानकारी के लिए चार, अस्पताल समय के लिए पांच, अस्पताल स्थान के लिए छह, और मेन्यू दोबारा सुनने के लिए नौ दबाएं।",
+"Appointment booking selected. Press 1 for General Physician, Press 2 for Specialist.":"अपॉइंटमेंट बुकिंग चुनी गई है। जनरल फिजिशियन के लिए एक दबाएं, स्पेशलिस्ट के लिए दो दबाएं।",
+"Emergency department selected. Please stay on the line.":"आपातकालीन विभाग चुना गया है। कृपया लाइन पर बने रहें।",
+"Our hospital departments include Cardiology, Orthopedics, and General Medicine.":"हमारे अस्पताल के विभागों में कार्डियोलॉजी, ऑर्थोपेडिक्स और जनरल मेडिसिन शामिल हैं।",
+"Hospital timings are Monday to Saturday, 8 AM to 8 PM. Emergency services are available 24 by 7.":"अस्पताल का समय सोमवार से शनिवार, सुबह आठ बजे से रात आठ बजे तक है। आपातकालीन सेवाएं चौबीस घंटे उपलब्ध हैं।",
+"City Hospital is located on MG Road, near Central Metro Station.":"सिटी हॉस्पिटल एमजी रोड पर, सेंट्रल मेट्रो स्टेशन के पास स्थित है।",
+"Invalid input. Please try again.":"गलत इनपुट। कृपया फिर से कोशिश करें।",
+"Please start call first":"कृपया पहले कॉल शुरू करें।",
+"Please enter or speak a message":"कृपया संदेश लिखें या बोलें।",
+"Voice output enabled":"आवाज़ आउटपुट चालू कर दिया गया है।",
+"Voice output disabled":"आवाज़ आउटपुट बंद कर दिया गया है।",
+"Voice input is not supported in this browser":"इस ब्राउज़र में वॉइस इनपुट समर्थित नहीं है।",
+"Call Started":"कॉल शुरू हो गई।",
+"IVR Response":"आईवीआर प्रतिक्रिया मिली।",
+"AI Response":"एआई प्रतिक्रिया मिली।"
+},
+"ta-IN":{
+"Welcome to City Hospital IVR. Press 1 for Appointment Booking, Press 2 for Doctor Availability, Press 3 for Emergency Services, Press 4 for Department Information, Press 5 for Hospital Timings, Press 6 for Hospital Location, Press 9 to hear this menu again.":"சிட்டி மருத்துவமனை ஐவிஆருக்கு வரவேற்கிறோம். நேரமதிப்பீடு பதிவு செய்ய ஒன்று அழுத்தவும், மருத்துவர் கிடைப்புக்கு இரண்டு, அவசர சேவைக்கு மூன்று, துறை தகவலுக்கு நான்கு, மருத்துவமனை நேரத்துக்கு ஐந்து, மருத்துவமனை இடத்துக்கு ஆறு, மற்றும் மெனுவை மீண்டும் கேட்க ஒன்பது அழுத்தவும்.",
+"Appointment booking selected. Press 1 for General Physician, Press 2 for Specialist.":"நேரமதிப்பீடு பதிவு தேர்வு செய்யப்பட்டது. பொது மருத்துவருக்கு ஒன்று அழுத்தவும், நிபுணருக்கு இரண்டு அழுத்தவும்.",
+"Emergency department selected. Please stay on the line.":"அவசர பிரிவு தேர்வு செய்யப்பட்டது. தயவுசெய்து லைனில் காத்திருக்கவும்.",
+"Our hospital departments include Cardiology, Orthopedics, and General Medicine.":"எங்கள் மருத்துவமனை துறைகளில் இதயவியல், எலும்பியல் மற்றும் பொது மருத்துவம் உள்ளன.",
+"Hospital timings are Monday to Saturday, 8 AM to 8 PM. Emergency services are available 24 by 7.":"மருத்துவமனை நேரம் திங்கள் முதல் சனி வரை காலை எட்டு மணி முதல் இரவு எட்டு மணி வரை. அவசர சேவைகள் இருபத்திநான்கு மணி நேரமும் கிடைக்கும்.",
+"City Hospital is located on MG Road, near Central Metro Station.":"சிட்டி மருத்துவமனை எம்ஜி சாலையில், சென்ட்ரல் மெட்ரோ நிலையம் அருகில் உள்ளது.",
+"Invalid input. Please try again.":"தவறான உள்ளீடு. தயவுசெய்து மீண்டும் முயற்சிக்கவும்.",
+"Please start call first":"தயவுசெய்து முதலில் அழைப்பை தொடங்கவும்.",
+"Please enter or speak a message":"தயவுசெய்து செய்தியை டைப் செய்யவும் அல்லது பேசவும்.",
+"Voice output enabled":"குரல் வெளிப்பாடு இயக்கப்பட்டது.",
+"Voice output disabled":"குரல் வெளிப்பாடு நிறுத்தப்பட்டது.",
+"Voice input is not supported in this browser":"இந்த உலாவியில் குரல் உள்ளீடு ஆதரிக்கப்படவில்லை.",
+"Call Started":"அழைப்பு தொடங்கியது.",
+"IVR Response":"ஐவிஆர் பதில் கிடைத்தது.",
+"AI Response":"ஏஐ பதில் கிடைத்தது."
+},
+"te-IN":{
+"Welcome to City Hospital IVR. Press 1 for Appointment Booking, Press 2 for Doctor Availability, Press 3 for Emergency Services, Press 4 for Department Information, Press 5 for Hospital Timings, Press 6 for Hospital Location, Press 9 to hear this menu again.":"సిటీ హాస్పిటల్ ఐవిఆర్‌కు స్వాగతం. అపాయింట్‌మెంట్ బుకింగ్ కోసం ఒకటి నొక్కండి, డాక్టర్ అందుబాటుకు రెండు, అత్యవసర సేవలకు మూడు, విభాగ సమాచారానికి నాలుగు, ఆసుపత్రి సమయాలకు ఐదు, ఆసుపత్రి స్థానానికి ఆరు, మరియు మెనూను మళ్లీ వినడానికి తొమ్మిది నొక్కండి.",
+"Appointment booking selected. Press 1 for General Physician, Press 2 for Specialist.":"అపాయింట్‌మెంట్ బుకింగ్ ఎంపిక చేయబడింది. జనరల్ ఫిజిషియన్ కోసం ఒకటి నొక్కండి, స్పెషలిస్ట్ కోసం రెండు నొక్కండి.",
+"Emergency department selected. Please stay on the line.":"అత్యవసర విభాగం ఎంపిక చేయబడింది. దయచేసి లైన్‌లో ఉండండి.",
+"Our hospital departments include Cardiology, Orthopedics, and General Medicine.":"మా ఆసుపత్రి విభాగాల్లో కార్డియాలజీ, ఆర్థోపెడిక్స్ మరియు జనరల్ మెడిసిన్ ఉన్నాయి.",
+"Hospital timings are Monday to Saturday, 8 AM to 8 PM. Emergency services are available 24 by 7.":"ఆసుపత్రి సమయం సోమవారం నుండి శనివారం వరకు ఉదయం ఎనిమిది గంటల నుంచి రాత్రి ఎనిమిది గంటల వరకు. అత్యవసర సేవలు ఇరవై నాలుగు గంటలు అందుబాటులో ఉంటాయి.",
+"City Hospital is located on MG Road, near Central Metro Station.":"సిటీ హాస్పిటల్ ఎంజీ రోడ్డులో, సెంట్రల్ మెట్రో స్టేషన్ దగ్గర ఉంది.",
+"Invalid input. Please try again.":"తప్పు ఇన్‌పుట్. దయచేసి మళ్లీ ప్రయత్నించండి.",
+"Please start call first":"దయచేసి ముందుగా కాల్ ప్రారంభించండి.",
+"Please enter or speak a message":"దయచేసి సందేశాన్ని టైప్ చేయండి లేదా మాట్లాడండి.",
+"Voice output enabled":"వాయిస్ అవుట్‌పుట్ ఆన్ చేయబడింది.",
+"Voice output disabled":"వాయిస్ అవుట్‌పుట్ ఆఫ్ చేయబడింది.",
+"Voice input is not supported in this browser":"ఈ బ్రౌజర్‌లో వాయిస్ ఇన్‌పుట్‌కు మద్దతు లేదు.",
+"Call Started":"కాల్ ప్రారంభమైంది.",
+"IVR Response":"ఐవిఆర్ స్పందన వచ్చింది.",
+"AI Response":"ఏఐ స్పందన వచ్చింది."
+},
+"kn-IN":{
+"Welcome to City Hospital IVR. Press 1 for Appointment Booking, Press 2 for Doctor Availability, Press 3 for Emergency Services, Press 4 for Department Information, Press 5 for Hospital Timings, Press 6 for Hospital Location, Press 9 to hear this menu again.":"ಸಿಟಿ ಆಸ್ಪತ್ರೆಗೆ ಐವಿಆರ್‌ಗೆ ಸ್ವಾಗತ. ಅಪಾಯಿಂಟ್‌ಮೆಂಟ್ ಬುಕ್ಕಿಂಗ್‌ಗೆ ಒಂದು ಒತ್ತಿ, ವೈದ್ಯರ ಲಭ್ಯತೆಗೆ ಎರಡು, ತುರ್ತು ಸೇವೆಗಳಿಗೆ ಮೂರು, ವಿಭಾಗ ಮಾಹಿತಿಗೆ ನಾಲ್ಕು, ಆಸ್ಪತ್ರೆ ಸಮಯಕ್ಕೆ ಐದು, ಆಸ್ಪತ್ರೆ ಸ್ಥಳಕ್ಕೆ ಆರು, ಮತ್ತು ಮೆನು ಮರುಕಳಿಸಲು ಒಂಬತ್ತು ಒತ್ತಿ.",
+"Appointment booking selected. Press 1 for General Physician, Press 2 for Specialist.":"ಅಪಾಯಿಂಟ್‌ಮೆಂಟ್ ಬುಕ್ಕಿಂಗ್ ಆಯ್ಕೆಮಾಡಲಾಗಿದೆ. ಸಾಮಾನ್ಯ ವೈದ್ಯರಿಗೆ ಒಂದು ಒತ್ತಿ, ತಜ್ಞರಿಗೆ ಎರಡು ಒತ್ತಿ.",
+"Emergency department selected. Please stay on the line.":"ತುರ್ತು ವಿಭಾಗ ಆಯ್ಕೆಮಾಡಲಾಗಿದೆ. ದಯವಿಟ್ಟು ಲೈನ್‌ನಲ್ಲಿ ಇರಿ.",
+"Our hospital departments include Cardiology, Orthopedics, and General Medicine.":"ನಮ್ಮ ಆಸ್ಪತ್ರೆಯ ವಿಭಾಗಗಳಲ್ಲಿ ಕಾರ್ಡಿಯಾಲಜಿ, ಆರ್ಥೊಪೆಡಿಕ್ಸ್ ಮತ್ತು ಸಾಮಾನ್ಯ ವೈದ್ಯಕೀಯ ಸೇರಿವೆ.",
+"Hospital timings are Monday to Saturday, 8 AM to 8 PM. Emergency services are available 24 by 7.":"ಆಸ್ಪತ್ರೆ ಸಮಯ ಸೋಮವಾರದಿಂದ ಶನಿವಾರದವರೆಗೆ ಬೆಳಿಗ್ಗೆ ಎಂಟು ರಿಂದ ರಾತ್ರಿ ಎಂಟು ತನಕ. ತುರ್ತು ಸೇವೆಗಳು ಇಪ್ಪತ್ತನಾಲ್ಕು ಗಂಟೆ ಲಭ್ಯ.",
+"City Hospital is located on MG Road, near Central Metro Station.":"ಸಿಟಿ ಆಸ್ಪತ್ರೆಗೆ ಎಂಜಿ ರಸ್ತೆಯಲ್ಲಿ, ಸೆಂಟ್ರಲ್ ಮೆಟ್ರೋ ನಿಲ್ದಾಣದ ಬಳಿ ಇದೆ.",
+"Invalid input. Please try again.":"ಅಮಾನ್ಯ ಇನ್‌ಪುಟ್. ದಯವಿಟ್ಟು ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.",
+"Please start call first":"ದಯವಿಟ್ಟು ಮೊದಲು ಕಾಲ್ ಪ್ರಾರಂಭಿಸಿ.",
+"Please enter or speak a message":"ದಯವಿಟ್ಟು ಸಂದೇಶವನ್ನು ಟೈಪ್ ಮಾಡಿ ಅಥವಾ ಮಾತನಾಡಿ.",
+"Voice output enabled":"ಧ್ವನಿ ಔಟ್‌ಪುಟ್ ಸಕ್ರಿಯಗೊಂಡಿದೆ.",
+"Voice output disabled":"ಧ್ವನಿ ಔಟ್‌ಪುಟ್ ನಿಷ್ಕ್ರಿಯಗೊಂಡಿದೆ.",
+"Voice input is not supported in this browser":"ಈ ಬ್ರೌಸರ್‌ನಲ್ಲಿ ಧ್ವನಿ ಇನ್‌ಪುಟ್ ಬೆಂಬಲಿತವಾಗಿಲ್ಲ.",
+"Call Started":"ಕಾಲ್ ಪ್ರಾರಂಭವಾಗಿದೆ.",
+"IVR Response":"ಐವಿಆರ್ ಪ್ರತಿಕ್ರಿಯೆ ಬಂದಿದೆ.",
+"AI Response":"ಎಐ ಪ್ರತಿಕ್ರಿಯೆ ಬಂದಿದೆ."
+},
+"ml-IN":{
+"Welcome to City Hospital IVR. Press 1 for Appointment Booking, Press 2 for Doctor Availability, Press 3 for Emergency Services, Press 4 for Department Information, Press 5 for Hospital Timings, Press 6 for Hospital Location, Press 9 to hear this menu again.":"സിറ്റി ആശുപത്രി ഐവിആറിലേക്ക് സ്വാഗതം. അപ്പോയിന്റ്മെന്റ് ബുക്കിംഗിന് ഒന്ന് അമർത്തുക, ഡോക്ടർ ലഭ്യതയ്ക്ക് രണ്ട്, അടിയന്തര സേവനങ്ങൾക്ക് മൂന്ന്, വിഭാഗ വിവരങ്ങൾക്ക് നാല്, ആശുപത്രി സമയത്തിന് അഞ്ച്, ആശുപത്രി സ്ഥാനത്തിന് ആറു, മെനു വീണ്ടും കേൾക്കാൻ ഒൻപത് അമർത്തുക.",
+"Appointment booking selected. Press 1 for General Physician, Press 2 for Specialist.":"അപ്പോയിന്റ്മെന്റ് ബുക്കിംഗ് തിരഞ്ഞെടുത്തു. ജനറൽ ഫിസിഷ്യന് വേണ്ടി ഒന്ന് അമർത്തുക, സ്പെഷ്യലിസ്റ്റിന് വേണ്ടി രണ്ട് അമർത്തുക.",
+"Emergency department selected. Please stay on the line.":"അടിയന്തര വിഭാഗം തിരഞ്ഞെടുത്തു. ദയവായി ലൈനിൽ തുടരുക.",
+"Our hospital departments include Cardiology, Orthopedics, and General Medicine.":"ഞങ്ങളുടെ ആശുപത്രി വിഭാഗങ്ങളിൽ കാർഡിയോളജി, ഓർത്തോപീഡിക്സ്, ജനറൽ മെഡിസിൻ ഉൾപ്പെടുന്നു.",
+"Hospital timings are Monday to Saturday, 8 AM to 8 PM. Emergency services are available 24 by 7.":"ആശുപത്രി സമയം തിങ്കളാഴ്ച മുതൽ ശനിയാഴ്ച വരെ രാവിലെ എട്ട് മുതൽ രാത്രി എട്ട് വരെ. അടിയന്തര സേവനങ്ങൾ ഇരുപത്തിനാലു മണിക്കൂറും ലഭ്യമാണ്.",
+"City Hospital is located on MG Road, near Central Metro Station.":"സിറ്റി ആശുപത്രി എംജി റോഡിൽ, സെൻട്രൽ മെട്രോ സ്റ്റേഷന്റെ സമീപത്താണ്.",
+"Invalid input. Please try again.":"തെറ്റായ ഇൻപുട്ട്. ദയവായി വീണ്ടും ശ്രമിക്കുക.",
+"Please start call first":"ദയവായി ആദ്യം കോൾ ആരംഭിക്കുക.",
+"Please enter or speak a message":"ദയവായി സന്ദേശം ടൈപ്പ് ചെയ്യുക അല്ലെങ്കിൽ സംസാരിക്കുക.",
+"Voice output enabled":"ശബ്ദ ഔട്ട്പുട്ട് പ്രവർത്തനക്ഷമമാക്കി.",
+"Voice output disabled":"ശബ്ദ ഔട്ട്പുട്ട് നിർത്തി.",
+"Voice input is not supported in this browser":"ഈ ബ്രൗസറിൽ ശബ്ദ ഇൻപുട്ട് പിന്തുണയ്ക്കുന്നില്ല.",
+"Call Started":"കോൾ ആരംഭിച്ചു.",
+"IVR Response":"ഐവിആർ മറുപടി ലഭിച്ചു.",
+"AI Response":"എഐ മറുപടി ലഭിച്ചു."
+},
+"bn-IN":{
+"Welcome to City Hospital IVR. Press 1 for Appointment Booking, Press 2 for Doctor Availability, Press 3 for Emergency Services, Press 4 for Department Information, Press 5 for Hospital Timings, Press 6 for Hospital Location, Press 9 to hear this menu again.":"সিটি হাসপাতাল আইভিআরে স্বাগতম। অ্যাপয়েন্টমেন্ট বুকিংয়ের জন্য এক চাপুন, ডাক্তার উপলভ্যতার জন্য দুই, জরুরি পরিষেবার জন্য তিন, বিভাগীয় তথ্যের জন্য চার, হাসপাতালের সময়ের জন্য পাঁচ, হাসপাতালের অবস্থানের জন্য ছয়, এবং মেনু আবার শুনতে নয় চাপুন।",
+"Appointment booking selected. Press 1 for General Physician, Press 2 for Specialist.":"অ্যাপয়েন্টমেন্ট বুকিং নির্বাচন করা হয়েছে। জেনারেল ফিজিশিয়ানের জন্য এক চাপুন, স্পেশালিস্টের জন্য দুই চাপুন।",
+"Emergency department selected. Please stay on the line.":"জরুরি বিভাগ নির্বাচন করা হয়েছে। অনুগ্রহ করে লাইনে থাকুন।",
+"Our hospital departments include Cardiology, Orthopedics, and General Medicine.":"আমাদের হাসপাতালের বিভাগগুলির মধ্যে কার্ডিওলজি, অর্থোপেডিক্স এবং জেনারেল মেডিসিন রয়েছে।",
+"Hospital timings are Monday to Saturday, 8 AM to 8 PM. Emergency services are available 24 by 7.":"হাসপাতালের সময় সোমবার থেকে শনিবার সকাল আটটা থেকে রাত আটটা পর্যন্ত। জরুরি পরিষেবা চব্বিশ ঘন্টাই পাওয়া যায়।",
+"City Hospital is located on MG Road, near Central Metro Station.":"সিটি হাসপাতাল এমজি রোডে, সেন্ট্রাল মেট্রো স্টেশনের কাছে অবস্থিত।",
+"Invalid input. Please try again.":"ভুল ইনপুট। অনুগ্রহ করে আবার চেষ্টা করুন।",
+"Please start call first":"অনুগ্রহ করে আগে কল শুরু করুন।",
+"Please enter or speak a message":"অনুগ্রহ করে একটি বার্তা টাইপ করুন বা বলুন।",
+"Voice output enabled":"ভয়েস আউটপুট চালু করা হয়েছে।",
+"Voice output disabled":"ভয়েস আউটপুট বন্ধ করা হয়েছে।",
+"Voice input is not supported in this browser":"এই ব্রাউজারে ভয়েস ইনপুট সমর্থিত নয়।",
+"Call Started":"কল শুরু হয়েছে।",
+"IVR Response":"আইভিআর উত্তর পাওয়া গেছে।",
+"AI Response":"এআই উত্তর পাওয়া গেছে।"
+}
+};
+
+function localizeText(text){
+
+if(selectedLanguage==="en-US") return text;
+
+const dictionary=STATIC_TRANSLATIONS[selectedLanguage] || {};
+
+if(dictionary[text]){
+return dictionary[text];
 }
 
-function sendInput(digit) {
-    fetch("http://127.0.0.1:8000/ivr/input", {
-        method: "POST",
-        headers: {"Content-Type": "application/json"},
-        body: JSON.stringify({
-            session_id: sessionId,
-            digit: digit
-        })
-    })
-    .then(res => res.json())
-    .then(data => {
-        document.getElementById("output").innerText = data.message;
-    });
+const doctorWaitMatch=text.match(/^Doctor availability selected\. Please wait while we retrieve doctor schedules\. Estimated wait time is about (\d+) minutes\.$/);
+if(doctorWaitMatch){
+const minutes=doctorWaitMatch[1];
+const minuteWord=(WAIT_MINUTE_WORDS[selectedLanguage] && WAIT_MINUTE_WORDS[selectedLanguage][minutes]) || minutes;
+
+if(selectedLanguage==="hi-IN"){
+return `डॉक्टर उपलब्धता चुनी गई है। कृपया प्रतीक्षा करें। अनुमानित प्रतीक्षा समय लगभग ${minuteWord} मिनट है।`;
 }
+
+if(selectedLanguage==="ta-IN"){
+return `மருத்துவர் கிடைப்புத் தேர்வு செய்யப்பட்டது. தயவுசெய்து காத்திருக்கவும். கணிக்கப்பட்ட காத்திருப்பு நேரம் சுமார் ${minuteWord} நிமிடங்கள்.`;
+}
+
+if(selectedLanguage==="te-IN"){
+return `డాక్టర్ అందుబాటు ఎంపిక చేయబడింది. దయచేసి వేచి ఉండండి. అంచనా వేచిచూడే సమయం సుమారు ${minuteWord} నిమిషాలు.`;
+}
+
+if(selectedLanguage==="kn-IN"){
+return `ವೈದ್ಯರ ಲಭ್ಯತೆ ಆಯ್ಕೆಮಾಡಲಾಗಿದೆ. ದಯವಿಟ್ಟು ಕಾಯಿರಿ. ಅಂದಾಜು ನಿರೀಕ್ಷಾ ಸಮಯ ಸುಮಾರು ${minuteWord} ನಿಮಿಷಗಳು.`;
+}
+
+if(selectedLanguage==="ml-IN"){
+return `ഡോക്ടർ ലഭ്യത തെരഞ്ഞെടുത്തു. ദയവായി കാത്തിരിക്കുക. കണക്കാക്കിയ കാത്തിരിപ്പ് സമയം ഏകദേശം ${minuteWord} മിനിറ്റ് ആണ്.`;
+}
+
+if(selectedLanguage==="bn-IN"){
+return `ডাক্তার উপলভ্যতা নির্বাচন করা হয়েছে। অনুগ্রহ করে অপেক্ষা করুন। আনুমানিক অপেক্ষার সময় প্রায় ${minuteWord} মিনিট।`;
+}
+}
+
+return text;
+
+}
+
+function setLanguage(languageCode){
+
+selectedLanguage=languageCode;
+localStorage.setItem("ivrLanguage",selectedLanguage);
+
+const labels=UI_LABELS[selectedLanguage] || UI_LABELS["en-US"];
+
+document.getElementById("subtitle").innerText=labels.subtitle;
+document.getElementById("startBtn").innerText=labels.startCall;
+document.getElementById("sendBtn").innerText=labels.send;
+document.getElementById("voiceBtn").innerText="🎤";
+document.getElementById("historyTitle").innerText=labels.history;
+document.getElementById("aiInput").placeholder=labels.aiPlaceholder;
+document.getElementById("languageStatus").innerText=labels.languageStatus;
+document.getElementById("quickDepartments").innerText=labels.quickDepartments;
+document.getElementById("quickTimings").innerText=labels.quickTimings;
+document.getElementById("quickLocation").innerText=labels.quickLocation;
+document.getElementById("quickInsurance").innerText=labels.quickInsurance;
+document.getElementById("speechToggle").innerText=speechEnabled?labels.voiceOn:labels.voiceOff;
+document.getElementById("stopBtn").innerText=labels.stopVoice;
+
+if(!sessionId){
+document.getElementById("output").innerText=labels.defaultOutput;
+}
+
+const selector=document.getElementById("languageSelect");
+if(selector && selector.value!==selectedLanguage){
+selector.value=selectedLanguage;
+}
+
+const messageMap={
+"en-US":"Language switched to English",
+"hi-IN":"भाषा हिन्दी में बदल दी गई है।",
+"ta-IN":"மொழி தமிழாக மாற்றப்பட்டுள்ளது.",
+"te-IN":"భాష తెలుగుకు మార్చబడింది.",
+"kn-IN":"ಭಾಷೆಯನ್ನು ಕನ್ನಡಕ್ಕೆ ಬದಲಿಸಲಾಗಿದೆ.",
+"ml-IN":"ഭാഷ മലയാളത്തിലേക്ക് മാറ്റി.",
+"bn-IN":"ভাষা বাংলায় পরিবর্তন করা হয়েছে।"
+};
+
+notifyUser("City Hospital IVR",messageMap[selectedLanguage] || "Language updated");
+
+}
+
+function initializeLanguage(){
+
+const savedLanguage=localStorage.getItem("ivrLanguage") || "en-US";
+setLanguage(savedLanguage);
+
+}
+
+function getBestVoice(languageCode){
+
+const synth=window.speechSynthesis;
+const voices=synth.getVoices();
+
+if(!voices || voices.length===0){
+return null;
+}
+
+const normalized=languageCode.toLowerCase();
+const base=normalized.split("-")[0];
+
+const exact=voices.find(voice=>voice.lang.toLowerCase()===normalized);
+if(exact) return exact;
+
+const sameBase=voices.find(voice=>voice.lang.toLowerCase().startsWith(base));
+if(sameBase) return sameBase;
+
+const englishFallback=voices.find(voice=>voice.lang.toLowerCase().startsWith("en"));
+if(englishFallback) return englishFallback;
+
+return voices[0];
+
+}
+
+function initializeSpeechEngine(){
+
+if(!("speechSynthesis" in window)){
+speechReady=false;
+return;
+}
+
+window.speechSynthesis.getVoices();
+speechReady=true;
+
+}
+
+function speak(text){
+
+if(!speechEnabled) return;
+
+if(currentAudio){
+currentAudio.pause();
+currentAudio.currentTime=0;
+currentAudio=null;
+}
+
+window.speechSynthesis.cancel();
+
+fetch("http://127.0.0.1:8000/tts",{
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({
+text:text,
+language:selectedLanguage
+})
+})
+.then(res=>res.json())
+.then(data=>{
+
+if(data.audio_base64){
+const audioSrc=`data:audio/mp3;base64,${data.audio_base64}`;
+const audio=new Audio(audioSrc);
+currentAudio=audio;
+
+audio.onended=function(){
+currentAudio=null;
+};
+
+audio.play().catch(()=>{
+currentAudio=null;
+fallbackBrowserSpeech(text);
+});
+return;
+}
+
+fallbackBrowserSpeech(text);
+
+})
+.catch(()=>{
+fallbackBrowserSpeech(text);
+});
+
+}
+
+function fallbackBrowserSpeech(text){
+
+if(!("speechSynthesis" in window)){
+notifyUser("City Hospital IVR","Voice output is not supported in this browser");
+return;
+}
+
+if(!speechReady){
+initializeSpeechEngine();
+}
+
+const speech=new SpeechSynthesisUtterance();
+
+speech.text=text;
+speech.lang=selectedLanguage;
+
+const matchedVoice=getBestVoice(selectedLanguage);
+
+if(matchedVoice){
+speech.voice=matchedVoice;
+speech.lang=matchedVoice.lang;
+}
+
+speech.rate=1;
+speech.pitch=1;
+
+window.speechSynthesis.speak(speech);
+
+}
+
+function showNotification(text){
+
+let notification=document.createElement("div");
+
+notification.className="notification";
+
+notification.innerText=text;
+
+document.body.appendChild(notification);
+
+setTimeout(()=>{
+notification.remove();
+},3000);
+
+}
+
+async function requestNotificationPermission(){
+
+if(!("Notification" in window)) return false;
+
+if(Notification.permission==="granted") return true;
+
+if(Notification.permission==="denied") return false;
+
+const permission=await Notification.requestPermission();
+
+return permission==="granted";
+
+}
+
+function notifyUser(title,body){
+
+const localizedBody=localizeText(body);
+
+showNotification(localizedBody);
+
+if("Notification" in window && Notification.permission==="granted"){
+new Notification(title,{body:localizedBody});
+}
+
+}
+
+function appendHistory(source,text){
+
+const history=document.getElementById("history");
+const item=document.createElement("div");
+const time=new Date().toLocaleTimeString();
+
+item.className="history-item";
+item.innerText=`${time} - ${source}: ${text}`;
+
+history.prepend(item);
+
+}
+
+function toggleSpeech(){
+
+speechEnabled=!speechEnabled;
+
+const labels=UI_LABELS[selectedLanguage] || UI_LABELS["en-US"];
+document.getElementById("speechToggle").innerText=speechEnabled?labels.voiceOn:labels.voiceOff;
+
+if(!speechEnabled){
+if(currentAudio){
+currentAudio.pause();
+currentAudio.currentTime=0;
+currentAudio=null;
+}
+window.speechSynthesis.cancel();
+}
+
+notifyUser("City Hospital IVR",speechEnabled?"Voice output enabled":"Voice output disabled");
+
+}
+
+function stopVoice(){
+
+if(currentAudio){
+currentAudio.pause();
+currentAudio.currentTime=0;
+currentAudio=null;
+}
+window.speechSynthesis.cancel();
+speechEnabled=false;
+const labels=UI_LABELS[selectedLanguage] || UI_LABELS["en-US"];
+document.getElementById("speechToggle").innerText=labels.voiceOff;
+notifyUser("City Hospital IVR","Voice output disabled");
+
+}
+
+function quickAsk(text){
+
+document.getElementById("aiInput").value=text;
+sendAI();
+
+}
+
+function startCall(){
+
+requestNotificationPermission();
+
+fetch("http://127.0.0.1:8000/ivr/start",{
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({})
+})
+.then(res=>res.json())
+.then(data=>{
+
+sessionId=data.session_id;
+
+const localizedMessage=localizeText(data.message);
+
+document.getElementById("output").innerText=localizedMessage;
+appendHistory("System",localizedMessage);
+
+speak(localizedMessage);
+
+notifyUser("City Hospital IVR","Call Started");
+
+});
+
+}
+
+function sendInput(digit){
+
+if(!sessionId){
+notifyUser("City Hospital IVR","Please start call first");
+return;
+}
+
+fetch("http://127.0.0.1:8000/ivr/input",{
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({
+session_id:sessionId,
+digit:digit
+})
+})
+.then(res=>res.json())
+.then(data=>{
+
+const localizedMessage=localizeText(data.message);
+
+document.getElementById("output").innerText=localizedMessage;
+appendHistory("IVR",`Key ${digit} -> ${localizedMessage}`);
+
+speak(localizedMessage);
+
+notifyUser("City Hospital IVR","IVR Response");
+
+});
+
+}
+
+function sendAI(){
+
+let message=document.getElementById("aiInput").value;
+
+if(!message || !message.trim()){
+notifyUser("City Hospital IVR","Please enter or speak a message");
+return;
+}
+
+fetch("http://127.0.0.1:8000/ai/message",{
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({
+message:message,
+session_id:sessionId || null
+})
+})
+.then(res=>res.json())
+.then(data=>{
+
+let aiOutput=data.prompt;
+
+if(data.intent==="unknown"){
+aiOutput=`${data.prompt} ${UNKNOWN_HELP_MAP[selectedLanguage] || UNKNOWN_HELP_MAP["en-US"]}`;
+}
+
+const localizedOutput=localizeText(aiOutput);
+
+document.getElementById("output").innerText=localizedOutput;
+appendHistory("AI",`You: ${message}`);
+appendHistory("AI",localizedOutput);
+
+speak(localizedOutput);
+
+notifyUser("City Hospital IVR","AI Response");
+
+});
+
+}
+
+function startVoice(){
+
+const SpeechRecognition=window.SpeechRecognition || window.webkitSpeechRecognition;
+
+if(!SpeechRecognition){
+notifyUser("City Hospital IVR","Voice input is not supported in this browser");
+return;
+}
+
+const recognition=new SpeechRecognition();
+
+recognition.lang=RECOGNITION_LANGUAGE_MAP[selectedLanguage] || selectedLanguage;
+
+recognition.onresult=function(event){
+
+const text=event.results[0][0].transcript;
+
+document.getElementById("aiInput").value=text;
+
+sendAI();
+
+}
+
+recognition.start();
+
+}
+
+initializeLanguage();
+initializeSpeechEngine();
+
+if("speechSynthesis" in window){
+window.speechSynthesis.onvoiceschanged=function(){
+initializeSpeechEngine();
+};
+}
+
 </script>
 
 </body>
