@@ -94,3 +94,39 @@ This outputs:
 - Full-cycle testing support includes functional tests and performance test tooling.
 - Deployment support includes Docker-based production rollout configuration.
 - Post-deployment monitoring support includes health and latency monitoring script.
+
+---
+
+## 🏥 Final Implementation – Hospital Conversational IVR System
+
+### 📌 Description
+
+This project implements an AI-enabled conversational IVR system for hospitals. It modernizes traditional IVR systems by enabling intelligent interaction between patients and hospital services using conversational AI.
+
+The system supports:
+
+* Appointment booking
+* Doctor and department navigation
+* Emergency handling
+* Hospital information services
+* Voice-based interaction using speech APIs
+
+### ⚙️ API Endpoints
+
+* POST /ivr/start → Start IVR session
+* POST /ivr/input → Process user input
+* POST /ai/message → Generate AI response
+* POST /tts → Convert text to speech
+* GET /health → System health check
+
+### 🌐 Deployment
+
+The backend is successfully deployed on Render cloud platform.
+
+🔗 Live URL:https://ai-enabled-conversational-ivr-fsvu.onrender.com/docs
+### 📸 Screenshots
+
+* Swagger API Interface
+* IVR Simulation
+* Deployment Output
+
