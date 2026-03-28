@@ -1,0 +1,9 @@
+services:
+  ivr-backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: conversational-ivr-backend
+    ports:
+      - "8000:8000"
+    restart: unless-stopped

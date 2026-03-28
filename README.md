@@ -31,3 +31,66 @@ The integration layer successfully enables real-time communication between the l
 - Conversational dialogue flows are implemented and mapped to IVR services (appointment, doctor, emergency, departments, timings, location, insurance).
 - Conversational AI is integrated into the legacy architecture through existing FastAPI endpoints.
 - Real-time voice input/output is enabled in the frontend using Web Speech API (input) and SpeechSynthesis (output).
+
+## Module 4: Testing and Deployment
+
+### Objective
+Final validation and production rollout of the modernized IVR system.
+
+### Task 1: Full-cycle Testing
+
+Functional validation is implemented through automated API tests in `tests/test_hospital_api.py`.
+
+Run tests:
+
+```powershell
+python -m pytest
+```
+
+Performance validation is implemented through a load-test utility.
+
+Run performance test (example):
+
+```powershell
+python scripts/performance_test.py --base-url http://127.0.0.1:8000 --requests 200 --concurrency 20
+```
+
+This reports success rate, average latency, and P95 latency.
+
+### Task 2: Deployment to Production Environment
+
+Containerized deployment artifacts are included:
+- `Dockerfile`
+- `docker-compose.yml`
+
+Deploy backend service:
+
+```powershell
+docker compose up -d --build
+```
+
+Access service health endpoint:
+
+```text
+http://127.0.0.1:8000/
+```
+
+### Task 3: Post-Deployment Monitoring
+
+Monitoring utility is included for periodic health and latency checks.
+
+Run monitor (example):
+
+```powershell
+python scripts/monitor_post_deploy.py --base-url http://127.0.0.1:8000 --interval 10 --checks 30 --latency-threshold 300
+```
+
+This outputs:
+- Health check pass/fail status
+- Request latency per interval
+- Summary of failures and latency alerts
+
+## Module 4 Status: Completed
+- Full-cycle testing support includes functional tests and performance test tooling.
+- Deployment support includes Docker-based production rollout configuration.
+- Post-deployment monitoring support includes health and latency monitoring script.
