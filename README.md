@@ -124,9 +124,4 @@ The system supports:
 The backend is successfully deployed on Render cloud platform.
 
 🔗 Live URL:https://ai-enabled-conversational-ivr-fsvu.onrender.com/docs
-### 📸 Screenshots
-
-* Swagger API Interface
-* IVR Simulation
-* Deployment Output
 
